@@ -32,14 +32,13 @@ class RetrievalService:
             if conditions:
                 search_query = search_query.filter(*conditions)
 
-            # Sort: exact brand name match first, then others
             if query:
                 exact_match = Medicine.brand_name.ilike(query)
                 starts_with = Medicine.brand_name.ilike(f"{query}%")
                 search_query = search_query.order_by(
-                    case((exact_match, 0), else_=1),  # Exact brand match first
-                    case((starts_with, 0), else_=1),  # Starts with query second
-                    Medicine.brand_name  # Alphabetical as tiebreaker
+                    case((exact_match, 0), else_=1),
+                    case((starts_with, 0), else_=1),
+                    Medicine.brand_name
                 )
 
             medicines = search_query.limit(limit).all()
@@ -52,7 +51,6 @@ class RetrievalService:
             self.db.close()
 
     def get_medicines_by_company(self, company: str) -> List[Dict[str, Any]]:
-        """Get all medicines from a specific company."""
         medicines = (
             self.db.query(Medicine)
             .filter(Medicine.company.ilike(f"%{company}%"))
@@ -62,7 +60,6 @@ class RetrievalService:
         return [med.to_dict() for med in medicines]
 
     def format_context(self, medicines: List[Dict[str, Any]]) -> str:
-        """Format medicine data for LLM prompt."""
         if not medicines:
             return "No matching medicines found."
 
