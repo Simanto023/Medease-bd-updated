@@ -39,7 +39,18 @@ def extract_price(package_str):
         return None
     match = re.search(r'৳\s*([\d,.]+)', str(package_str))
     if match:
-        return float(match.group(1).replace(',', ''))
+        price_str = match.group(1).replace(',', '')
+        # Handle multiple decimal points — take only the valid number part
+        try:
+            return float(price_str)
+        except ValueError:
+            # Try to fix: take the first valid floating-point pattern
+            valid_match = re.search(r'\d+\.?\d*', price_str)
+            if valid_match:
+                try:
+                    return float(valid_match.group())
+                except ValueError:
+                    return None
     return None
 
 
