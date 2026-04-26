@@ -39,20 +39,10 @@ class RAGService:
         }
 
     def _build_english_prompt(self, query: str, context: str, company: str = None) -> str:
-        company_info = f" from {company}" if company else ""
         prompt = (
-            f"Medicine database results:\n{context}\n\n"
-            f"User question: {query}{company_info}\n\n"
-            "Rules:\n"
-            "- Only report medicines from the database above\n"
-            "- State brand name, generic name, company, strength, form, price\n"
-            "- If the context includes Generic Drug Information (indication, uses, dosage), include that in your answer\n"
-            "- If price is N/A, say 'Price not available'\n"
-            "- Do not mention any medicine or company not in the database\n"
-            "- Do not invent dosages or prices\n"
-            "- Keep answer short\n"
-            "- End with: 'Consult your doctor before taking any medicine.'\n\n"
-            "Answer: "
+            f"{context}\n\n"
+            f"Question: {query}\n\n"
+            "Answer using only the information above:\n"
         )
         return prompt
 
