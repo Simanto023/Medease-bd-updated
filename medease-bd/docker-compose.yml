@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: medease-db
+    environment:
+      POSTGRES_USER: medease
+      POSTGRES_PASSWORD: medease123
+      POSTGRES_DB: medease_db
+    # Tuned for 16GB RAM — gives Postgres ~1.5GB working memory
+    command: >
+      postgres
+        -c shared_buffers=512MB
+        -c effective_cache_size=1GB
+        -c maintenance_work_mem=128MB
+        -c max_connections=50
+        -c work_mem=16MB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medease -d medease_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    networks:
+      - medease-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: medease-redis
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - medease-network
+
+  data-init:
+    build:
+      context: ./data_init
+      dockerfile: Dockerfile
+    container_name: medease-data-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: medease
+      POSTGRES_PASSWORD: medease123
+      POSTGRES_DB: medease_db
+    networks:
+      - medease-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: medease-backend
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: medease
+      POSTGRES_PASSWORD: medease123
+      POSTGRES_DB: medease_db
+      LLM_PROVIDER: gguf
+      MODEL_PATH: app/models/qwen2.5-1.5b-instruct.Q4_0.gguf
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Ryzen 4500U: 6 cores, no hyperthreading, AVX2 support
+      LLM_THREADS: "5"
+      LLM_BATCH_SIZE: "32"
+      LLM_CONTEXT_SIZE: "2048"
+      LLM_MAX_TOKENS: "150"
+      # Tell OpenBLAS to use 5 threads (matches LLM_THREADS)
+      OMP_NUM_THREADS: "5"
+      OPENBLAS_NUM_THREADS: "5"
+    volumes:
+      - ./backend/app/models:/app/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      data-init:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    networks:
+      - medease-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medease-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    depends_on:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    networks:
+      - medease-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  medease-network:
+    driver: bridge
