@@ -1,6 +1,6 @@
 from sqlalchemy import or_, case
 from app.database import SessionLocal
-from app.models.medicine import Medicine
+from app.models.medicine import Medicine, Generic
 from typing import List, Dict, Any
 
 
@@ -50,6 +50,23 @@ class RetrievalService:
         finally:
             self.db.close()
 
+    def search_generics(self, generic_name: str) -> Dict[str, Any]:
+        """Search generics table for drug info."""
+        try:
+            gen = (
+                self.db.query(Generic)
+                .filter(Generic.generic_name.ilike(f"%{generic_name}%"))
+                .first()
+            )
+            if gen:
+                return gen.to_dict()
+            return {}
+        except Exception as e:
+            print(f"Generic search error: {e}")
+            return {}
+        finally:
+            self.db.close()
+
     def get_medicines_by_company(self, company: str) -> List[Dict[str, Any]]:
         medicines = (
             self.db.query(Medicine)
@@ -59,7 +76,7 @@ class RetrievalService:
         )
         return [med.to_dict() for med in medicines]
 
-    def format_context(self, medicines: List[Dict[str, Any]]) -> str:
+    def format_context(self, medicines: List[Dict[str, Any]], generic_info: Dict[str, Any] = None) -> str:
         if not medicines:
             return "No matching medicines found."
 
@@ -70,9 +87,26 @@ class RetrievalService:
             context += f"   Company: {med['company']}\n"
             context += f"   Strength: {med['strength'] or 'N/A'}\n"
             context += f"   Form: {med['form'] or 'N/A'}\n"
-            if med["price_bdt"]:
-                context += f"   Price: ৳{med['price_bdt']:.2f}\n\n"
+            if med.get("price_bdt") and med["price_bdt"] > 0:
+                context += f"   Price: ৳{med['price_bdt']:.2f}\n"
             else:
-                context += "   Price: N/A\n\n"
+                context += "   Price: N/A\n"
+            if med.get("package_info"):
+                context += f"   Package: {med['package_info']}\n"
+            context += "\n"
+
+        if generic_info:
+            context += "\nGeneric Drug Information:\n"
+            context += f"Generic Name: {generic_info.get('generic_name', 'N/A')}\n"
+            if generic_info.get("drug_class"):
+                context += f"Drug Class: {generic_info['drug_class']}\n"
+            if generic_info.get("indication"):
+                context += f"Indication: {generic_info['indication']}\n"
+            if generic_info.get("indication_desc"):
+                context += f"Uses: {generic_info['indication_desc'][:500]}\n"
+            if generic_info.get("dosage"):
+                context += f"Dosage: {generic_info['dosage'][:300]}\n"
+            if generic_info.get("side_effects"):
+                context += f"Side Effects: {generic_info['side_effects'][:300]}\n"
 
         return context

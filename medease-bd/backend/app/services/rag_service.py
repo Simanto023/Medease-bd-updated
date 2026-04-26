@@ -13,7 +13,14 @@ class RAGService:
         """Process user query through RAG pipeline."""
 
         medicines = self.retrieval.search_medicines(query, company, limit=5)
-        context = self.retrieval.format_context(medicines)
+        
+        # If we found medicines, also look up generic info for the first match
+        generic_info = None
+        if medicines:
+            first_generic = medicines[0].get("generic_name", "")
+            generic_info = self.retrieval.search_generics(first_generic)
+        
+        context = self.retrieval.format_context(medicines, generic_info)
 
         if language == "bn":
             prompt = self._build_bangla_prompt(query, context, company)
@@ -38,10 +45,9 @@ class RAGService:
             f"User question: {query}{company_info}\n\n"
             "Rules:\n"
             "- Only report medicines from the database above\n"
-            "- State brand name, generic name, company, strength, form\n"
+            "- State brand name, generic name, company, strength, form, price\n"
+            "- If the context includes Generic Drug Information (indication, uses, dosage), include that in your answer\n"
             "- If price is N/A, say 'Price not available'\n"
-            "- If asked what a medicine is used for, check the generic name in the results "
-            "and say: 'Paracetamol is commonly used for fever and pain' (use the actual generic name)\n"
             "- Do not mention any medicine or company not in the database\n"
             "- Do not invent dosages or prices\n"
             "- Keep answer short\n"
@@ -57,9 +63,9 @@ class RAGService:
             f"প্রশ্ন: {query}{company_info}\n\n"
             "নিয়ম:\n"
             "- শুধুমাত্র উপরের ডাটাবেজের ওষুধ সম্পর্কে বলুন\n"
-            "- ব্র্যান্ড নাম, জেনেরিক নাম, কোম্পানি, শক্তি, ফর্ম উল্লেখ করুন\n"
+            "- ব্র্যান্ড নাম, জেনেরিক নাম, কোম্পানি, শক্তি, ফর্ম, মূল্য উল্লেখ করুন\n"
+            "- যদি জেনেরিক ওষুধের তথ্য (ব্যবহার, ডোজ) থাকে, উত্তর দিন\n"
             "- মূল্য না থাকলে 'মূল্য পাওয়া যায়নি' বলুন\n"
-            "- ওষুধ কী কাজে ব্যবহার হয় জিজ্ঞেস করলে জেনেরিক নাম দেখে বলুন\n"
             "- ডাটাবেজে নেই এমন কিছু বলবেন না\n"
             "- ছোট উত্তর দিন\n"
             "- শেষে বলুন: 'ওষুধ সেবনের আগে ডাক্তারের পরামর্শ নিন।'\n\n"
