@@ -39,10 +39,19 @@ class RAGService:
         }
 
     def _build_english_prompt(self, query: str, context: str, company: str = None) -> str:
+        company_info = f" from {company}" if company else ""
         prompt = (
-            f"{context}\n\n"
-            f"Question: {query}\n\n"
-            "Answer using only the information above:\n"
+            f"Medicine database results:\n{context}\n\n"
+            f"User question: {query}{company_info}\n\n"
+            "Rules:\n"
+            "- Only report medicines from the database above\n"
+            "- State: brand, generic, company, strength, form, price\n"
+            "- If context has Generic Drug Information, include indication/uses/dosage/side effects\n"
+            "- If price is N/A, say 'Price not available'\n"
+            "- Do not prescribe or recommend medicines\n"
+            "- Keep answer under 4 sentences\n"
+            "- End with: 'Consult your doctor.'\n\n"
+            "Answer: "
         )
         return prompt
 
@@ -52,13 +61,13 @@ class RAGService:
             f"ওষুধের ডাটাবেজ:\n{context}\n\n"
             f"প্রশ্ন: {query}{company_info}\n\n"
             "নিয়ম:\n"
-            "- শুধুমাত্র উপরের ডাটাবেজের ওষুধ সম্পর্কে বলুন\n"
-            "- ব্র্যান্ড নাম, জেনেরিক নাম, কোম্পানি, শক্তি, ফর্ম, মূল্য উল্লেখ করুন\n"
-            "- যদি জেনেরিক ওষুধের তথ্য (ব্যবহার, ডোজ) থাকে, উত্তর দিন\n"
-            "- মূল্য না থাকলে 'মূল্য পাওয়া যায়নি' বলুন\n"
-            "- ডাটাবেজে নেই এমন কিছু বলবেন না\n"
+            "- শুধু ডাটাবেজের ওষুধ সম্পর্কে বলুন\n"
+            "- বলুন: ব্র্যান্ড, জেনেরিক, কোম্পানি, শক্তি, ফর্ম, মূল্য\n"
+            "- ব্যবহার/ইঙ্গিত থাকলে বলুন\n"
+            "- মূল্য না থাকলে 'মূল্য নেই' বলুন\n"
+            "- ওষুধ prescribe করবেন না\n"
             "- ছোট উত্তর দিন\n"
-            "- শেষে বলুন: 'ওষুধ সেবনের আগে ডাক্তারের পরামর্শ নিন।'\n\n"
+            "- শেষে বলুন: 'ডাক্তারের পরামর্শ নিন।'\n\n"
             "উত্তর: "
         )
         return prompt

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   postgres:
@@ -9,7 +7,6 @@ services:
       POSTGRES_USER: medease
       POSTGRES_PASSWORD: medease123
       POSTGRES_DB: medease_db
-    # Tuned for 16GB RAM — gives Postgres ~1.5GB working memory
     command: >
       postgres
         -c shared_buffers=512MB
@@ -52,6 +49,8 @@ services:
       context: ./data_init
       dockerfile: Dockerfile
     container_name: medease-data-init
+    profiles:
+      - init
     depends_on:
       postgres:
         condition: service_healthy
@@ -78,15 +77,13 @@ services:
       POSTGRES_PASSWORD: medease123
       POSTGRES_DB: medease_db
       LLM_PROVIDER: gguf
-      MODEL_PATH: app/models/qwen2.5-1.5b-instruct.Q4_0.gguf
+      MODEL_PATH: app/models/qwen2.5-3b-instruct.Q4_K_M.gguf
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      # Ryzen 4500U: 6 cores, no hyperthreading, AVX2 support
       LLM_THREADS: "5"
       LLM_BATCH_SIZE: "32"
-      LLM_CONTEXT_SIZE: "2048"
-      LLM_MAX_TOKENS: "150"
-      # Tell OpenBLAS to use 5 threads (matches LLM_THREADS)
+      LLM_CONTEXT_SIZE: "1024"
+      LLM_MAX_TOKENS: "80"
       OMP_NUM_THREADS: "5"
       OPENBLAS_NUM_THREADS: "5"
     volumes:
@@ -94,14 +91,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      data-init:
-        condition: service_completed_successfully
     deploy:
       resources:
         limits:
-          memory: 4G
+          memory: 5G
         reservations:
-          memory: 2G
+          memory: 3G
     networks:
       - medease-network
     restart: unless-stopped

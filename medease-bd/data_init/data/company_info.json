@@ -1,0 +1,246 @@
+{
+  "square pharmaceuticals ltd.": {
+    "display_name": "স্কয়ার ফার্মাসিউটিক্যালস",
+    "english_name": "Square Pharmaceuticals",
+    "bangla_aliases": [
+      "স্কয়ার",
+      "square"
+    ],
+    "founded": 1958,
+    "market_share_pct": 16.5,
+    "score": 5,
+    "revenue_bdt_crore": 4800,
+    "employees": 30000,
+    "certifications": [
+      "US FDA",
+      "UK MHRA",
+      "EU GMP",
+      "TGA Australia"
+    ],
+    "exports_to": [
+      "USA",
+      "UK",
+      "Germany",
+      "Myanmar",
+      "Sri Lanka",
+      "Kenya",
+      "Australia"
+    ],
+    "notable_brands": [
+      "Napa",
+      "Napa Extra",
+      "Napa Extend",
+      "Seclo",
+      "Sergel",
+      "Vioxx"
+    ],
+    "description_bn": "বাংলাদেশের সবচেয়ে বড় ফার্মাসিউটিক্যাল কোম্পানি। ৪৩টি দেশে রপ্তানি করে। US FDA এবং UK MHRA অনুমোদিত।",
+    "trust_level": "সর্বোচ্চ বিশ্বস্ত"
+  },
+  "incepta pharmaceuticals ltd.": {
+    "display_name": "ইনসেপ্টা ফার্মাসিউটিক্যালস",
+    "english_name": "Incepta Pharmaceuticals",
+    "bangla_aliases": [
+      "ইনসেপ্টা",
+      "incepta"
+    ],
+    "founded": 1999,
+    "market_share_pct": 9.8,
+    "score": 5,
+    "revenue_bdt_crore": 2800,
+    "employees": 9000,
+    "certifications": [
+      "EU GMP",
+      "UK MHRA",
+      "WHO GMP"
+    ],
+    "exports_to": [
+      "UK",
+      "Germany",
+      "Myanmar",
+      "Sri Lanka",
+      "Cambodia"
+    ],
+    "notable_brands": [
+      "Ace",
+      "Ace Plus",
+      "Pantix",
+      "Fexo",
+      "Panto"
+    ],
+    "description_bn": "দ্বিতীয় বৃহত্তম ফার্মাসিউটিক্যাল কোম্পানি। EU GMP সার্টিফাইড। ইউরোপে রপ্তানি করে।",
+    "trust_level": "অত্যন্ত বিশ্বস্ত"
+  },
+  "beximco pharmaceuticals ltd.": {
+    "display_name": "বেক্সিমকো ফার্মাসিউটিক্যালস",
+    "english_name": "Beximco Pharmaceuticals",
+    "bangla_aliases": [
+      "বেক্সিমকো",
+      "beximco"
+    ],
+    "founded": 1976,
+    "market_share_pct": 7.2,
+    "score": 5,
+    "revenue_bdt_crore": 2200,
+    "employees": 8000,
+    "certifications": [
+      "US FDA",
+      "UK MHRA",
+      "EU GMP"
+    ],
+    "exports_to": [
+      "USA",
+      "UK",
+      "Australia",
+      "Germany",
+      "France"
+    ],
+    "notable_brands": [
+      "Neofloxin",
+      "Suprox",
+      "Bexitrol"
+    ],
+    "description_bn": "লন্ডন স্টক এক্সচেঞ্জে তালিকাভুক্ত। US FDA অনুমোদিত প্রথম বাংলাদেশি কোম্পানি।",
+    "trust_level": "অত্যন্ত বিশ্বস্ত"
+  },
+  "renata limited": {
+    "display_name": "রেনাটা লিমিটেড",
+    "english_name": "Renata Limited",
+    "bangla_aliases": [
+      "রেনাটা",
+      "renata"
+    ],
+    "founded": 1972,
+    "market_share_pct": 6.1,
+    "score": 4,
+    "revenue_bdt_crore": 1800,
+    "employees": 6500,
+    "certifications": [
+      "EU GMP",
+      "UK MHRA",
+      "WHO GMP"
+    ],
+    "exports_to": [
+      "UK",
+      "Germany",
+      "Sri Lanka",
+      "Myanmar"
+    ],
+    "notable_brands": [
+      "Losartan",
+      "Atorva",
+      "Renamin",
+      "Cetrin"
+    ],
+    "description_bn": "হৃদরোগ ও স্নায়বিক ওষুধে বিশেষজ্ঞ। শক্তিশালী গবেষণা বিভাগ।",
+    "trust_level": "খুব বিশ্বস্ত"
+  },
+  "acme laboratories ltd.": {
+    "display_name": "একমি ল্যাবরেটরিজ",
+    "english_name": "ACME Laboratories",
+    "bangla_aliases": [
+      "একমি",
+      "acme"
+    ],
+    "founded": 1954,
+    "market_share_pct": 5.8,
+    "score": 4,
+    "revenue_bdt_crore": 1700,
+    "employees": 6000,
+    "certifications": [
+      "WHO GMP",
+      "EU GMP"
+    ],
+    "exports_to": [
+      "Myanmar",
+      "Sri Lanka",
+      "Cambodia",
+      "Nepal"
+    ],
+    "notable_brands": [
+      "Sergel",
+      "Panto",
+      "Amoxil"
+    ],
+    "description_bn": "বাংলাদেশের অন্যতম প্রাচীন কোম্পানি। গ্রামীণ বিতরণ নেটওয়ার্কে শক্তিশালী।",
+    "trust_level": "বিশ্বস্ত"
+  },
+  "opsonin pharma limited": {
+    "display_name": "অপসোনিন ফার্মা",
+    "english_name": "Opsonin Pharma",
+    "bangla_aliases": [
+      "অপসোনিন",
+      "opsonin"
+    ],
+    "founded": 1956,
+    "market_share_pct": 3.5,
+    "score": 3,
+    "revenue_bdt_crore": 950,
+    "employees": 4000,
+    "certifications": [
+      "WHO GMP"
+    ],
+    "exports_to": [
+      "Myanmar",
+      "Nepal"
+    ],
+    "notable_brands": [
+      "Cef-3",
+      "Zithromax"
+    ],
+    "description_bn": "অ্যান্টিবায়োটিক ও জেনেরিক ওষুধে বিশেষজ্ঞ।",
+    "trust_level": "সাধারণ মানের"
+  },
+  "healthcare pharmaceuticals limited": {
+    "display_name": "হেলথকেয়ার ফার্মাসিউটিক্যালস",
+    "english_name": "Healthcare Pharmaceuticals",
+    "bangla_aliases": [
+      "হেলথকেয়ার",
+      "healthcare"
+    ],
+    "founded": 1981,
+    "market_share_pct": 3.2,
+    "score": 3,
+    "revenue_bdt_crore": 880,
+    "employees": 3800,
+    "certifications": [
+      "WHO GMP"
+    ],
+    "exports_to": [
+      "Myanmar",
+      "Sri Lanka"
+    ],
+    "notable_brands": [
+      "Nafcil",
+      "Herpex",
+      "Clopitab"
+    ],
+    "description_bn": "হৃদরোগ ও স্নায়বিক ওষুধে বিশেষজ্ঞ।",
+    "trust_level": "সাধারণ মানের"
+  },
+  "general pharmaceuticals ltd.": {
+    "display_name": "জেনারেল ফার্মাসিউটিক্যালস",
+    "english_name": "General Pharmaceuticals",
+    "bangla_aliases": [
+      "জেনারেল",
+      "general"
+    ],
+    "founded": 1965,
+    "market_share_pct": 2.5,
+    "score": 3,
+    "revenue_bdt_crore": 700,
+    "employees": 2800,
+    "certifications": [
+      "WHO GMP"
+    ],
+    "exports_to": [
+      "Myanmar"
+    ],
+    "notable_brands": [
+      "Genolev",
+      "Gen-Amox"
+    ],
+    "description_bn": "সাশ্রয়ী জেনেরিক ওষুধ উৎপাদনে বিশেষজ্ঞ।",
+    "trust_level": "সাধারণ মানের"
+  }
+}

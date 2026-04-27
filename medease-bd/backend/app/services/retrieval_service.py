@@ -11,38 +11,112 @@ class RetrievalService:
     def search_medicines(
         self, query: str, company: str = None, limit: int = 5
     ) -> List[Dict[str, Any]]:
-        """Search medicines using ILIKE text search with exact brand name priority."""
+        """Search medicines - extracts keywords and also searches generics indications."""
         try:
-            search_query = self.db.query(Medicine)
+            stop_words = {
+                "what", "is", "the", "of", "a", "an", "for", "used", "in", "to",
+                "price", "dosage", "side", "effects", "does", "how", "much", "cost",
+                "tell", "me", "about", "can", "you", "i", "need", "want", "know",
+                "and", "or", "its", "have", "with", "my", "has", "any", "some",
+                "am", "facing", "severe", "mild", "which", "would", "be", "should",
+                "feel", "back", "pain", "cold", "fever", "headache", "depression",
+                "কি", "কেন", "কিভাবে", "কখন", "কার", "কিসের", "ঔষধ", "ব্যবহার", "দাম"
+            }
 
-            conditions = []
-            if query:
-                search_term = f"%{query}%"
-                conditions.append(
+            words = query.lower().split()
+            search_terms = [w for w in words if w not in stop_words and len(w) >= 2]
+
+            if not search_terms:
+                search_terms = [query]
+
+            medicines = []
+            seen_ids = set()
+
+            # First: Search medicine names (brand, generic, company)
+            for term in search_terms[:3]:
+                search_query = self.db.query(Medicine)
+                search_pattern = f"%{term}%"
+
+                conditions = [
                     or_(
-                        Medicine.brand_name.ilike(search_term),
-                        Medicine.generic_name.ilike(search_term),
-                        Medicine.company.ilike(search_term),
+                        Medicine.brand_name.ilike(search_pattern),
+                        Medicine.generic_name.ilike(search_pattern),
+                        Medicine.company.ilike(search_pattern),
                     )
-                )
+                ]
 
-            if company:
-                conditions.append(Medicine.company.ilike(f"%{company}%"))
+                if company:
+                    conditions.append(Medicine.company.ilike(f"%{company}%"))
 
-            if conditions:
                 search_query = search_query.filter(*conditions)
 
-            if query:
-                exact_match = Medicine.brand_name.ilike(query)
-                starts_with = Medicine.brand_name.ilike(f"{query}%")
+                exact_match = Medicine.brand_name.ilike(term)
+                starts_with = Medicine.brand_name.ilike(f"{term}%")
                 search_query = search_query.order_by(
                     case((exact_match, 0), else_=1),
                     case((starts_with, 0), else_=1),
                     Medicine.brand_name
                 )
 
-            medicines = search_query.limit(limit).all()
-            return [med.to_dict() for med in medicines]
+                results = search_query.limit(limit).all()
+                for med in results:
+                    if med.id not in seen_ids:
+                        seen_ids.add(med.id)
+                        medicines.append(med.to_dict())
+
+            # Second: If no results, search generics indications
+            if not medicines:
+                for term in search_terms[:3]:
+                    gen_results = (
+                        self.db.query(Generic)
+                        .filter(
+                            or_(
+                                Generic.indication.ilike(f"%{term}%"),
+                                Generic.indication_desc.ilike(f"%{term}%"),
+                                Generic.generic_name.ilike(f"%{term}%"),
+                            )
+                        )
+                        .limit(3)
+                        .all()
+                    )
+
+                    for gen in gen_results:
+                        # Find medicines matching this generic
+                        matching_meds = (
+                            self.db.query(Medicine)
+                            .filter(Medicine.generic_name.ilike(f"%{gen.generic_name}%"))
+                            .limit(5)
+                            .all()
+                        )
+                        for med in matching_meds:
+                            if med.id not in seen_ids:
+                                seen_ids.add(med.id)
+                                medicines.append(med.to_dict())
+
+            # Third: If still nothing, search symptom keywords in full database
+            if not medicines and len(search_terms) > 0:
+                # Try each word individually
+                for word in words:
+                    if len(word) >= 2 and word not in stop_words:
+                        full_search = (
+                            self.db.query(Medicine)
+                            .filter(
+                                or_(
+                                    Medicine.brand_name.ilike(f"%{word}%"),
+                                    Medicine.generic_name.ilike(f"%{word}%"),
+                                )
+                            )
+                            .limit(limit)
+                            .all()
+                        )
+                        for med in full_search:
+                            if med.id not in seen_ids:
+                                seen_ids.add(med.id)
+                                medicines.append(med.to_dict())
+                        if len(medicines) >= limit:
+                            break
+
+            return medicines[:limit]
 
         except Exception as e:
             print(f"Search error: {e}")
@@ -103,10 +177,10 @@ class RetrievalService:
             if generic_info.get("indication"):
                 context += f"Indication: {generic_info['indication']}\n"
             if generic_info.get("indication_desc"):
-                context += f"Uses: {generic_info['indication_desc'][:500]}\n"
+                context += f"Uses: {generic_info['indication_desc'][:300]}\n"
             if generic_info.get("dosage"):
-                context += f"Dosage: {generic_info['dosage'][:300]}\n"
+                context += f"Dosage: {generic_info['dosage'][:200]}\n"
             if generic_info.get("side_effects"):
-                context += f"Side Effects: {generic_info['side_effects'][:300]}\n"
+                context += f"Side Effects: {generic_info['side_effects'][:150]}\n"
 
         return context
